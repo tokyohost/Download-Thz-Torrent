@@ -7,15 +7,9 @@
 
 使用：
 
-Linux:
-  环境必须在python3以上
+Winows:
+  必须安装 python3.7
   
-  wget https://github.com/tokyohost/thz-Download/archive/master.zip
+  python run.sh  
   
-  unzip master.zip
-  
-  cd thz-Download-master
-  
-  python run.py 
-
-按照提示输入sleep时间，和起始爬取位置（链接必须是具体的帖子！默认按发帖日期向后爬取）
+  按照提示输入sleep时间，和起始爬取位置（链接必须是具体的帖子！默认按发帖日期向后爬取）
