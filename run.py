@@ -1,59 +1,75 @@
 import requests
 from bs4 import BeautifulSoup
-from PIL import Image
-from io import BytesIO
-import re
 import time
-import logging,os
-import eventlet
-
+from Get_pid import Get_pid
+from Log_set import Log_set
+from MainRunNumber import MainRunNumber
+from DownloadTorrent import DownloadTorrent
+from mkdir import mkdir
+from Save_img import Save_img
+from Get_Imgurl import Get_Imgurl
+from Get_nextPage import Get_nextPage
 
 
 
 
 def Main(Nowurl,NowNumber,Sleeptime):
-
+    #设置休眠时间
     Sleeptime = Sleeptime
 
 
+
+    #统计抓取页面总数
     NowNumber = MainRunNumber(NowNumber)
+    print("已抓取页面数："+str(NowNumber))
 
+    #构造虚拟浏览器参数
     header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
-    strhtml = requests.get(Nowurl,headers = header)
+    strhtml = requests.get(Nowurl,headers = header)  #Get Html Data
+    #print(strhtml.text)
 
 
+    #解析网页，获得介绍信息
+    # temp_stehtml = str(strhtml.text)
     new_strhtml = strhtml.text
-    soup = BeautifulSoup(new_strhtml,'lxml')
+    soup = BeautifulSoup(new_strhtml,'lxml') #使用lxml解析文档
 
 
-    pidnumber = Get_pid(soup)
-
-    data = soup.select('#postmessage_'+pidnumber)
+    #调用Get_pid 获取页面唯一pid
+    try:
+        pidnumber = Get_pid(soup)
+    except Exception:
+        print("获取失败，请检查输入链接是否是论坛帖子链接！")
+        return -1
+    data = soup.select('#postmessage_'+pidnumber) #定位到资源信息界面
     line_data = str(data).replace('<br/>','\n')
 
 
-
+    #获取资源名字
     name = soup = BeautifulSoup(new_strhtml,'lxml')
-    name = soup.select('#thread_subject')
-    name = str(name).replace('<span id="thread_subject">','').replace('</span>','')
+    name = soup.select('#thread_subject') #定位到资源名字
+    name = str(name).replace('<span id="thread_subject">','').replace('</span>','').replace('/','').replace('*','').replace('?','').replace('<','').replace('>','').replace(':','')  #去掉Windows文件夹命名不允许的符号 bug：\ 未检查！
+    # print(name)
 
 
+    #新建目录单独保存
+    mkdirPatch = "Download"+"\\"+name+"\\"
+    mkdir(mkdirPatch) #调用函数新教目录
 
 
-    mkdirPatch = "已爬取资源"+"\\"+name+"\\"
-    mkdir(mkdirPatch)
+    #获取图片介绍，并保存为文件
+    # imgid = Get_imgid(soup,"#postmessage_"+pidnumber) #获取定位的图片容器id
+    # get_img = soup.select(imgid)
 
 
-    imgid = Get_imgid(soup,'#postmessage_'+pidnumber)
-    get_img = soup.select(imgid)
-
-
+    #打开文件保存资源详细信息
     f = open(mkdirPatch+name+'.txt','w',encoding='utf-8')
     f.write(str(data).replace('<br/>',''))
-    f.close()
+    f.close() #关闭文件
 
 
 
+    #获取图片链接并下载
     Img_number = 1
     ImgUrl = Get_Imgurl(soup)
     i = 0
@@ -61,179 +77,88 @@ def Main(Nowurl,NowNumber,Sleeptime):
         try:
             Save_img(ImgUrl[i],Img_number,mkdirPatch)
         except OSError:
-            print("暂时不支持png格式")
+            print("图片下载失败！")
         else:
-            print("图片保存成功！")
+            print("第"+str(Img_number)+"张图片正在下载... [共"+str(len(ImgUrl))+"张]")
 
         i+=1
         Img_number+=1
 
 
-    Downloadurl = DownloadTorrent(soup)
-    r = requests.get(Downloadurl)
-    with open(mkdirPatch+name+'.torrent', "wb") as code:
-        code.write(r.content)
+    #下载种子文件
+    Downloadurl = DownloadTorrent(soup) #获取种子下载页面
+    #print(len(Downloadurl))
+    if (len(Downloadurl) == 1): #判断 是否存在1080p种子
+        DownTorrenturl = "http://thz5.net/forum.php?mod=attachment&" + Downloadurl[0]
+        r = requests.get(DownTorrenturl)
+        with open(mkdirPatch+name+' 720p'+'.torrent', "wb") as code:
+            code.write(r.content)
+
+        print("种子下载完成!")
+    elif (len(Downloadurl)>1):
+
+        TorrentName = ["720p","1080p","2k","4k"]
+        i = 0
+        while (i < len(Downloadurl)):
+            # 下载720p资源
+            DownTorrenturl = "http://thz5.net/forum.php?mod=attachment&" + Downloadurl[i]
+            r = requests.get(DownTorrenturl)
+            # print("正在下载种子文件！")
+            with open(mkdirPatch + name + TorrentName[i] + ".torrent", "wb") as code:
+                code.write(r.content)
+            i+=1
+
+        print(str(len(Downloadurl))+"个种子下载完成!")
+    else:
+        print("未找到种子文件！")
 
 
-
-
+    #获取下一页url,递归调用主函数
     url = Get_nextPage(soup,pidnumber)
 
-    time.sleep(3)
+    time.sleep(3) #休眠3秒
+
+    print("现在休眠"+str(Sleeptime)+"秒")
+    return url #返回下一页面url
 
 
-    return url
-
-def Save_img(url,Img_name,dirpath):
-
-    with eventlet.Timeout(2, False):
-        response = requests.get(url, verify=False)
-        print("connect Success ！")
-        img = Image.open(BytesIO(response.content))
-        img.save(dirpath + str(Img_name) + '.jpg')
-
-
-
-
-
-
-
-
-def Get_pid(soup):
-    pid = soup.findAll('div', {'class': "pls"})
-    Get_pid = str(pid)
-    p = re.compile(r'\d+')
-    pidnumber = p.findall(Get_pid)
-
-    return pidnumber[0]
-
-
-def Get_imgid(soup,pidselect):
-
-    data = soup.select(pidselect+' > ignore_js_op > img')
-    Get_imgid = str(data)
-    p = re.compile(r'\d+')
-    imgIdNumber = p.findall(Get_imgid)
-    return '#aimg_'+imgIdNumber[0]
-
-def mkdir(path):
-
-    import os
-
-
-    path=path.strip()
-    path=path.rstrip("\\")
-
-    isExists=os.path.exists(path)
-
-
-    if not isExists:
-
-        print (path+' 创建成功')
-
-        os.makedirs(path)
-        return True
-    else:
-
-        print (path+' 目录已存在')
-        return False
-
-def Get_nextPage(soup,pidnumber):
-
-    nextpageid = soup.findAll('div', {'class': 'pcb'})
-
-    Get_nextpageid = str(nextpageid)
-    p = re.compile(r'thread-'+'\d+')
-    urlnumber = p.findall(Get_nextpageid)
-    url ="http://thz5.net/"+urlnumber[0]+"-1-1.html"
-
-
-    print("现在休眠3秒")
-    return url
-
-def DownloadTorrent(soup):
-    dl = soup.findAll('dl',{'class':"tattl"})
-    Get_dl = str(dl)
-    p = re.compile(r'aid='+'\w+')
-    urlend = p.findall(Get_dl)
-    url = "http://thz5.net/forum.php?mod=attachment&"+urlend[0]
-
-    return url
-
-def Get_Imgurl(soup):
-    data = soup.findAll('td',{'class':"t_f"})
-    Get_SmallImgurl = str(data)
-    p = re.compile(r"http://"+'\w*'+"."+'\w+'+"."+'\w+'+"/"+'\w+'+"/"+'\w+'+"/"+'\w+'+"/"+'\w+'+"/"+"\w+"+"."+"\w+")
-    p2 = re.compile(r"http://"+'\w*'+"."+'\w+'+"."+'\w+'+"/"+'\w+'+"/"+'\w+'+"/"+'\w+'+"/"+'\w+'+"."+'?\w+')
-    p3 = re.compile(
-        r"http://" + '\w*' + "." + '\w+' + "." + '\w+' + "/" + '\w+' + "/" + '\w+' + "/" + '\w+' + "/" + '\w+'+"/" + '\w+' + "." + '?\w+')
-    Imgurlend = p.findall(Get_SmallImgurl)
-    Imgurlend2 = p2.findall(Get_SmallImgurl)
-    Imgurlend3 = p3.findall(Get_SmallImgurl)
-    Imgurlend = Imgurlend +Imgurlend2+Imgurlend3
-
-    new_Imgurl = []
-
-
-    i = 0
-    while (i<len(Imgurlend)):
-        if (Imgurlend[i]):
-            temp = Imgurlend[i]
-            Findjpg = '.jpg'
-            isFind = temp.find(Findjpg)
-            if (isFind > 0):
-                print("后缀正常！:"+str(temp))
-                new_Imgurl.append(temp)
-            else:
-                del Imgurlend[i]
-                print("Remove:"+temp)
-
-        i+=1
-
-
-
-
-
-    print("去重筛选后所有图片链接为："+str(new_Imgurl))
-    Imgurl = new_Imgurl
-
-    return Imgurl
-def Log_set():
-    logger = logging.getLogger()
-    fh = logging.FileHandler("run.log",encoding="utf-8")
-    sh = logging.StreamHandler()
-    fm = logging.Formatter('%(asctime)s-%(filename)s[line%(lineno)d]-%(levelname)s-%(message)s')  # 格式化对象
-    fh.setFormatter(fm)
-    sh.setFormatter(fm)
-    logger.addHandler(fh)
-    logger.addHandler(sh)
-    logger.setLevel(logging.DEBUG)
-
-    return logger
-
-def MainRunNumber(NowNumber):
-
-
-    MainRunNumber = NowNumber
-    MainRunNumber += 1
-
-    return MainRunNumber
 
 if __name__ == '__main__':
 
 
-
+    print("感谢您的使用！如有用，请给个star，本项目地址：https://github.com/tokyohost/get-Thz-Torrent-and-info")
     print("按Ctrl+Z 退出！")
-    url = input("请输入开始爬取的页面：")
-    Sleeptime = input("请输入爬取页面等待事件：（单位：秒）")
+    Staticurl = 'http://thz5.net/thread-1930952-1-1.html' #初始化链接地址
+    url = input("请输入开始爬取的论坛帖子链接：(输入‘Y’即使用默认地址：http://thz5.net/thread-1930952-1-1.html)").strip()
+    if (url == 'Y'):
+        url = Staticurl
 
-    NowNumber = MainRunNumber(-1)
+    Sleeptime = input("请输入每次爬取页面等待时间：（单位：秒）")
 
+    MaxNumber = input("请输入本次爬取多少页自动退出：")
+    MaxNumber = int(MaxNumber)
 
+    NowNumber = MainRunNumber(-2)#初始化统计页面参数
+    #url = 'http://thz5.net/thread-1838108-1-1.html' #开始爬的第一个页面
 
+    # 初始化Log日志文件输出
     logger = Log_set()
 
 
 
     while True:
         url  = Main(url,NowNumber,Sleeptime)
+        NowNumber+=1
+
+
+        try:
+            if(MaxNumber <= NowNumber):
+                break
+            logger.info(" 目前已爬取页面： " + str(NowNumber)+" 最大爬取限度："+str(MaxNumber))  # 输出日志到文件
+            print(" 目前已爬取页面： " + str(NowNumber)+" 最大爬取限度："+str(MaxNumber))
+        except Exception:
+            print("请输入正确的最大爬取数！")
+    #url = Main(url, NowNumber, Sleeptime)
+
+
+    print("已爬取完毕，本次共爬取了："+str(NowNumber)+"页,保存在本目录下“Download”文件夹内！，谢谢您的使用！本项目地址为：https://github.com/tokyohost/get-Thz-Torrent-and-info")
