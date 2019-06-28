@@ -24,6 +24,12 @@ Winows:
   https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe
   
   安装完成后
+  *安装依赖，所有程序需要的依赖都在install.txt 中，你需要打开cmd命令提示符，然后进入下载解压后的目录中键入以下代码以安装依赖：
+  pip install -r install.txt
+  
+  [![cmd.png](https://i.loli.net/2019/06/28/5d158e8dedf6d65567.png)](https://i.loli.net/2019/06/28/5d158e8dedf6d65567.png)
+  到此环境以安装好，您可以开始运行了！
+  
   
   *在搜索IDLE并打开：
   
@@ -35,7 +41,7 @@ Winows:
   
   
   *之后按照提示输入相应数据即可开始爬取数据！
-  
+[![runing.png](https://i.loli.net/2019/06/28/5d158ed7aa5bd24375.png)](https://i.loli.net/2019/06/28/5d158ed7aa5bd24375.png)
   
   注意：按照提示输入sleep时间，和起始爬取位置（链接必须是具体的帖子！默认按发帖日期向后爬取），默认爬取的数据保存在目录下Download文件夹中！ 
   
