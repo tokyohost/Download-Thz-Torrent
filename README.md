@@ -1,5 +1,6 @@
 # thz-Download
 获取桃花族论坛图片，种子，爬虫  可爬取指定板块所有资源：）
+自动分类汇总，一晚上差不多2000+个文件夹速度
 
 请低调使用，需要Python 环境，如需有用请给个Star^_^ 谢谢
 
@@ -9,9 +10,33 @@
 
 使用：
 
+
 Winows:
-  必须安装 python3.7
+  点击此链接下载项目压缩包
   
-  python run.sh  
+  https://github.com/tokyohost/get-Thz-Torrent-and-info/archive/master.zip
   
-  按照提示输入sleep时间，和起始爬取位置（链接必须是具体的帖子！默认按发帖日期向后爬取）
+  下载完成后解压；
+  之后你需要:
+  
+  *安装 python3.7
+  
+  https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe
+  
+  安装完成后
+  
+  *在搜索IDLE并打开：
+  
+[![idle.png](https://i.loli.net/2019/06/28/5d158aaadf08657780.png)](https://i.loli.net/2019/06/28/5d158aaadf08657780.png)
+
+  *选中 run.py 后，运行：
+  
+[![run.png](https://i.loli.net/2019/06/28/5d158b95dd8fa92254.png)](https://i.loli.net/2019/06/28/5d158b95dd8fa92254.png)
+  
+  
+  *之后按照提示输入相应数据即可开始爬取数据！
+  
+  
+  注意：按照提示输入sleep时间，和起始爬取位置（链接必须是具体的帖子！默认按发帖日期向后爬取），默认爬取的数据保存在目录下Download文件夹中！ 
+  
+  请低调使用。
