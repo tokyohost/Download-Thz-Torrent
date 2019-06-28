@@ -1,3 +1,4 @@
+#conding=utf-8
 def mkdir(path):
     # 引入模块
     import os

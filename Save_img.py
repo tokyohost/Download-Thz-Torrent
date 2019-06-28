@@ -1,4 +1,4 @@
-
+#conding=utf-8
 import requests
 from PIL import Image
 from io import BytesIO

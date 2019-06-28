@@ -1,4 +1,4 @@
-
+#conding=utf-8
 import logging
 
 def Log_set():

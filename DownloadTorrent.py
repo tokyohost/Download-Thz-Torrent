@@ -1,3 +1,4 @@
+#conding=utf-8
 import re
 
 def DownloadTorrent(soup):
