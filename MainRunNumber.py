@@ -1,4 +1,5 @@
-#conding=utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 def MainRunNumber(NowNumber):
     #统计共爬取多少 个页面

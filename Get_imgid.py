@@ -1,4 +1,5 @@
-#conding=utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import re
 
 def Get_imgid(soup,pidselect): #页面信息，pid资源容器

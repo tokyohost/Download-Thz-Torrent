@@ -1,4 +1,5 @@
-#conding=utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 def mkdir(path):
     # 引入模块
     import os
