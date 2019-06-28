@@ -131,7 +131,7 @@ if __name__ == '__main__':
     print("感谢您的使用！如有用，请给个star，本项目地址：https://github.com/tokyohost/get-Thz-Torrent-and-info")
     print("按Ctrl+Z 退出！")
     Staticurl = 'http://thz5.net/thread-1930952-1-1.html' #初始化链接地址
-    url = input("请输入开始爬取的论坛帖子链接：(输入‘Y’即使用默认地址：http://thz5.net/thread-1930952-1-1.html)").strip()
+    url = input("请输入开始爬取的论坛帖子链接：(输入‘Y’即使用默认地址：http://thz5.net/thread-1930952-1-1.html)")
     if (url == 'Y'):
         url = Staticurl
 
