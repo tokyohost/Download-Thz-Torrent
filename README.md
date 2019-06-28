@@ -16,7 +16,8 @@ Winows:
   
   https://github.com/tokyohost/get-Thz-Torrent-and-info/archive/master.zip
   
-  下载完成后解压；
+  下载完成后解压：
+  
   之后你需要:
   
   *安装 python3.7
@@ -24,6 +25,7 @@ Winows:
   https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe
   
   安装完成后
+  
   *安装依赖，所有程序需要的依赖都在install.txt 中，你需要打开cmd命令提示符，然后进入下载解压后的目录中键入以下代码以安装依赖：
   pip install -r install.txt
   
