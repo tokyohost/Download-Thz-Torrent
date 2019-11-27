@@ -4,8 +4,8 @@
 
 请低调使用，需要Python 环境，如需有用请给个Star^_^ 谢谢
 
-
-[![`2__LP2G49OJ8_[MA}X437V.png](https://i.loli.net/2019/06/24/5d10a24448c4632642.png)](https://i.loli.net/2019/06/24/5d10a24448c4632642.png)
+＃多线程加持版windows exe 已排上日程
+[ ！[ `2__LP2G49OJ8_ [MA} X437V.png]（https://i.loli.net/2019/06/24/5d10a24448c4632642.png）]（https://i.loli.net/2019/06/24/5d10a24448c4632642 .png）
 
 
 使用：
